@@ -12,7 +12,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY ./dockerfile-commons/curl_and_gpgverify.sh ./dockerfile-commons/reduce_alpine.sh /tmp/
 RUN cd /tmp && mkdir data/ &&\
     \
-    # Download & verify the queried pari/gp with the packages and gp2c distributives.
+    # Download & verify the queried pari/gp with the packages.
     eval "echo unix/pari-$parigp_version.tar.gz\
                packages/{${parigp_packages// /,}}.tgz" | tr ' ' '\n' |\
     xargs -I@ sh /tmp/curl_and_gpgverify.sh -v $PARIGP_PREFIX/@.asc $PARIGP_PREFIX/@ || true &&\
@@ -40,7 +40,7 @@ ARG vcsref
 LABEL \
     stage=production \
     org.label-schema.name="tiny-parigp" \
-    org.label-schema.description="Minify your PARI/GP + GP2C." \
+    org.label-schema.description="Minified PARI/GP distribution." \
     org.label-schema.url="https://hub.docker.com/r/semenovp/tiny-parigp/" \
     org.label-schema.vcs-ref="$vcsref" \
     org.label-schema.vcs-url="https://github.com/piotr-semenov/parigp-docker.git" \
