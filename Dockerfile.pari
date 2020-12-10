@@ -10,7 +10,7 @@ RUN apk update &&\
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY ./dockerfile-commons/curl_and_gpgverify.sh ./dockerfile-commons/reduce_alpine.sh /tmp/
-RUN cd /tmp &&\
+RUN cd /tmp && mkdir data/ &&\
     \
     # Download & verify the queried pari/gp with the packages and gp2c distributives.
     eval "echo unix/pari-$parigp_version.tar.gz\
