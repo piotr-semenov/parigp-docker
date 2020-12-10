@@ -2,7 +2,6 @@ FROM alpine:latest as builder
 LABEL stage=intermediate
 
 ARG parigp_version="2.13.0"
-ARG gp2c_version="0.0.12"
 ARG parigp_packages="elldata galdata galpol nftables seadata"
 ENV PARIGP_PREFIX=http://pari.math.u-bordeaux.fr/pub/pari/
 
@@ -15,8 +14,7 @@ RUN cd /tmp &&\
     \
     # Download & verify the queried pari/gp with the packages and gp2c distributives.
     eval "echo unix/pari-$parigp_version.tar.gz\
-               packages/{${parigp_packages// /,}}.tgz\
-               GP2C/gp2c-$gp2c_version.tar.gz" | tr ' ' '\n' |\
+               packages/{${parigp_packages// /,}}.tgz" | tr ' ' '\n' |\
     xargs -I@ sh /tmp/curl_and_gpgverify.sh -v $PARIGP_PREFIX/@.asc $PARIGP_PREFIX/@ || true &&\
     \
     # Unpack & install.
@@ -27,16 +25,11 @@ RUN cd /tmp &&\
     cd pari-$parigp_version/ && ./Configure && make -j gp && make dobench install &&\
     (mv /tmp/data /usr/local/share/pari/ || true) &&\
     \
-    ## GP2C
-    cd /tmp/gp2c-$gp2c_version/ && ./configure && make -j && make install &&\
-    \
     # Reduce to the minimal size distribution.
-    sh /tmp/reduce_alpine.sh -v /target gp gp2c /usr/local/lib/libpari.so\
-                                        /usr/local/include/pari\
-                                        /usr/local/share/{pari,gp2c} &&\
+    sh /tmp/reduce_alpine.sh -v /target gp gphelp perl\
+                                        /usr/local/share/pari/{data,doc} &&\
     \
     # Clean out.
-    rm -rf /usr/local/share/pari/doc &&\
     cd /tmp && rm -rf /tmp/* &&\
     apk del .helpers
 
