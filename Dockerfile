@@ -17,7 +17,7 @@ RUN cd /tmp &&\
     eval "echo unix/pari-$parigp_version.tar.gz\
                packages/{${parigp_packages// /,}}.tgz\
                GP2C/gp2c-$gp2c_version.tar.gz" | tr ' ' '\n' |\
-    xargs -I@ sh /tmp/curl_and_gpgverify.sh -v $PARIGP_PREFIX/@.asc $PARIGP_PREFIX/@ &&\
+    xargs -I@ sh /tmp/curl_and_gpgverify.sh -v $PARIGP_PREFIX/@.asc $PARIGP_PREFIX/@ || true &&\
     \
     # Unpack & install.
     ls *.*gz | xargs gunzip &&\
