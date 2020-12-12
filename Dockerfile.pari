@@ -21,12 +21,16 @@ RUN cd /tmp && mkdir data/ &&\
     ls *.*gz | xargs gunzip &&\
     ls *.tar | xargs -I@ tar xf @ &&\
     \
-    ## PARI/GP.
     cd pari-$parigp_version/ && ./Configure && make -j gp && make dobench install &&\
     (mv /tmp/data /usr/local/share/pari/ || true) &&\
     \
     # Reduce to the minimal size distribution.
-    sh /tmp/reduce_alpine.sh -v /target gp gphelp perl\
+    # Tool gphelp is developed in pure Perl, so no need even for core packages.
+    sh /tmp/reduce_alpine.sh -v /target perl gp gphelp /usr/local/lib/libpari.so\
+                                        \
+                                        /usr/local/lib/pari/pari.cfg\
+                                        \
+                                        /usr/local/include/pari\
                                         /usr/local/share/pari/{data,doc} &&\
     \
     # Clean out.
