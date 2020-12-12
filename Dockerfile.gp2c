@@ -1,0 +1,65 @@
+FROM semenovp/tiny-parigp:latest as builder0
+LABEL stage=intermediate
+
+
+FROM alpine:latest as builder1
+LABEL stage=intermediate
+
+ARG gp2c_version="0.0.12"
+ENV PARIGP_PREFIX=http://pari.math.u-bordeaux.fr/pub/pari/
+
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+
+# Note, gp2c-run can be built only in presence of already installed pari/gp.
+COPY --from=builder0 / /
+COPY ./dockerfile-commons/curl_and_gpgverify.sh ./dockerfile-commons/reduce_alpine.sh /tmp/
+RUN apk update &&\
+    apk --no-cache add --virtual .helpers musl-dev &&\
+    \
+    # Save to the target distribution.
+    sh /tmp/reduce_alpine.sh -v /target /usr/include /usr/lib
+
+RUN apk --no-cache add --virtual .helpers curl grep gnupg build-base &&\
+    cd /tmp/ &&\
+    \
+    # Download & verify the queried gp2c distributives.
+    target_name="gp2c-$gp2c_version" &&\
+    target_url="$PARIGP_PREFIX/GP2C/$target_name.tar.gz" &&\
+    sh /tmp/curl_and_gpgverify.sh -v $target_url.asc $target_url &&\
+    \
+    # Unpack & install.
+    tar -xvzf $target_name.tar.gz &&\
+    cd /tmp/$target_name/ && ./configure && make -j && make install &&\
+    \
+    # Reduce to the minimal size distribution.
+    ## Fetch gp2c and its dependencies.
+    sh /tmp/reduce_alpine.sh -v /target gp2c\
+                                        \
+                                        /usr/local/share/gp2c/func.dsc &&\
+    ## Fetch gp2c-run script and its runtime dependencies.
+    sh /tmp/reduce_alpine.sh -v /target gp2c-run\
+                                        \
+                                        grep sed\
+                                        as ld gcc $(find /usr/libexec/gcc -type f -name 'cc1' -or\
+                                                                                  -name 'liblto_plugin.so') /usr/lib/libgcc_s.so /usr/lib/libgcc_s.so.1\
+                                        \
+                                        /usr/lib/gcc/ &&\
+    \
+    # Clean out.
+    cd /tmp && rm -rf /tmp/* &&\
+    apk del .helpers
+
+
+FROM builder0
+
+ARG vcsref
+LABEL \
+    stage=production \
+    org.label-schema.name="tiny-parigp" \
+    org.label-schema.description="Minified PARI/GP + GP2C distributions." \
+    org.label-schema.url="https://hub.docker.com/r/semenovp/tiny-parigp/" \
+    org.label-schema.vcs-ref="$vcsref" \
+    org.label-schema.vcs-url="https://github.com/piotr-semenov/parigp-docker.git" \
+    maintainer='Piotr Semenov <piotr.k.semenov@gmail.com>'
+
+COPY --from=builder1 /target /
