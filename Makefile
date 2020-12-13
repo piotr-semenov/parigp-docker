@@ -20,8 +20,12 @@ test-dockerignore:  ## Lists all the files in the context directory accepted by 
 
 
 .PHONY: lint
-lint: Dockerfile  ## Lints the Dockerfile.
-	@docker run \
-		--rm \
-		-v $(PWD)/dockerfile-commons/.hadolint.yaml:/tmp/.hadolint.yaml:ro \
-		-i hadolint/hadolint /bin/hadolint -f tty -c /tmp/.hadolint.yaml -< Dockerfile
+lint: export FILES = $(shell find . -type f -name "Dockerfile.*")  ## Lints the Dockerfile.*.
+lint:
+	for p in $$FILES; do \
+	  docker run --rm \
+	             -v `pwd`/dockerfile-commons/.hadolint.yaml:/tmp/.hadolint.yaml:ro \
+	             -v `pwd`:/workdir \
+	             -w /workdir \
+	             -i hadolint/hadolint /bin/hadolint -f tty -c /tmp/.hadolint.yaml $$p; \
+	done
