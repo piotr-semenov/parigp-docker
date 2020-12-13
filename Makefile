@@ -17,3 +17,11 @@ test-dockerignore:  ## Lists all the files in the context directory accepted by 
 	@docker run --rm \
 	 -t $(LOCAL_PREFIX)build-context
 	@docker rmi $(LOCAL_PREFIX)build-context
+
+
+.PHONY: lint
+lint: Dockerfile  ## Lints the Dockerfile.
+	@docker run \
+		--rm \
+		-v $(PWD)/dockerfile-commons/.hadolint.yaml:/tmp/.hadolint.yaml:ro \
+		-i hadolint/hadolint /bin/hadolint -f tty -c /tmp/.hadolint.yaml -< Dockerfile
