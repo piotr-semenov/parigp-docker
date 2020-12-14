@@ -1,0 +1,17 @@
+**/.git/
+.github/
+hooks/
+tests/
+
+.gitmodules
+.gitignore
+.dockerignore
+Makefile*
+Dockerfile.*
+**/README.md
+**/LICENSE
+**/.DS_Store
+
+./dockerfile-commons/**
+!./dockerfile-commons/.hadolint.yaml
+!./dockerfile-commons/*.sh
