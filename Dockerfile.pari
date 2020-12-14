@@ -1,4 +1,4 @@
-FROM alpine:latest as builder
+FROM alpine as builder
 LABEL stage=intermediate
 
 ARG parigp_version="2.13.0"
@@ -10,7 +10,11 @@ RUN apk update &&\
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY ./dockerfile-commons/curl_and_gpgverify.sh ./dockerfile-commons/reduce_alpine.sh /tmp/
-RUN cd /tmp && mkdir data/ &&\
+
+WORKDIR /tmp
+
+# hadolint ignore=SC2011
+RUN mkdir ./data/ &&\
     \
     # Download & verify the queried pari/gp with the packages.
     eval "echo unix/pari-$parigp_version.tar.gz\
@@ -18,10 +22,10 @@ RUN cd /tmp && mkdir data/ &&\
     xargs -I@ sh /tmp/curl_and_gpgverify.sh -v $PARIGP_PREFIX/@.asc $PARIGP_PREFIX/@ || true &&\
     \
     # Unpack & install.
-    ls *.*gz | xargs gunzip &&\
-    ls *.tar | xargs -I@ tar xf @ &&\
+    ls ./*.*gz | xargs gunzip &&\
+    ls ./*.tar | xargs -I@ tar xf @ &&\
     \
-    cd pari-$parigp_version/ && ./Configure && make -j gp && make dobench install &&\
+    bash -c 'cd "/tmp/pari-$parigp_version/" && ./Configure && make gp && make dobench install' &&\
     (mv /tmp/data /usr/local/share/pari/ || true) &&\
     \
     # Reduce to the minimal size distribution.
@@ -34,7 +38,7 @@ RUN cd /tmp && mkdir data/ &&\
                                         /usr/local/share/pari/{data,doc} &&\
     \
     # Clean out.
-    cd /tmp && rm -rf /tmp/* &&\
+    rm -rf /tmp/* &&\
     apk del .helpers
 
 
