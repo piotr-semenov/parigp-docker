@@ -1,8 +1,8 @@
-FROM semenovp/tiny-parigp:latest as builder0
+FROM semenovp/tiny-parigp as builder0
 LABEL stage=intermediate
 
 
-FROM alpine:latest as builder1
+FROM alpine as builder1
 LABEL stage=intermediate
 
 ARG gp2c_version="0.0.12"
@@ -19,17 +19,19 @@ RUN apk update &&\
     # Save to the target distribution.
     sh /tmp/reduce_alpine.sh -v /target /usr/include /usr/lib
 
+WORKDIR /tmp/
+
+# hadolint ignore=SC2046
 RUN apk --no-cache add --virtual .helpers curl grep gnupg build-base &&\
-    cd /tmp/ &&\
     \
     # Download & verify the queried gp2c distributives.
-    target_name="gp2c-$gp2c_version" &&\
+    export target_name="gp2c-$gp2c_version" &&\
     target_url="$PARIGP_PREFIX/GP2C/$target_name.tar.gz" &&\
-    sh /tmp/curl_and_gpgverify.sh -v $target_url.asc $target_url &&\
+    sh /tmp/curl_and_gpgverify.sh -v "$target_url.asc" "$target_url" &&\
     \
     # Unpack & install.
-    tar -xvzf $target_name.tar.gz &&\
-    cd /tmp/$target_name/ && ./configure && make -j && make install &&\
+    tar -xvzf "$target_name.tar.gz" &&\
+    sh -c 'cd "/tmp/$target_name/" && ./configure && make -j && make install' &&\
     \
     # Reduce to the minimal size distribution.
     ## Fetch gp2c and its dependencies.
@@ -46,7 +48,7 @@ RUN apk --no-cache add --virtual .helpers curl grep gnupg build-base &&\
                                         /usr/lib/gcc/ &&\
     \
     # Clean out.
-    cd /tmp && rm -rf /tmp/* &&\
+    rm -rf /tmp/* &&\
     apk del .helpers
 
 
