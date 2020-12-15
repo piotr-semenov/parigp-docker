@@ -25,7 +25,7 @@ RUN mkdir ./data/ &&\
     ls ./*.*gz | xargs gunzip &&\
     ls ./*.tar | xargs -I@ tar xf @ &&\
     \
-    bash -c 'cd "/tmp/pari-$parigp_version/" && ./Configure && make gp && make dobench install' &&\
+    bash -c 'cd "/tmp/pari-$parigp_version/" && ./Configure && make gp dobench install' &&\
     (mv /tmp/data /usr/local/share/pari/ || true) &&\
     \
     # Reduce to the minimal size distribution.
