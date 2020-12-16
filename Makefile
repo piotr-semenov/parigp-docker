@@ -35,7 +35,6 @@ build_gp2c:  ## Builds the image for GP2C/GP2C-RUN.
 
 .PHONY: test
 test:  ## Tests the the already built images.
-	@$(call goss_docker_image,$(LOCAL_PREFIX):latest,tests/gp.yaml,PARIGP_VER=$(PARIGP_VER))
-	@$(call goss_docker_image,$(LOCAL_PREFIX):latest-alldata,tests/gp_alldata.yaml)
-
-	@$(call goss_docker_image,$(LOCAL_PREFIX):gp2c-latest,tests/gp2c.yaml,PARIGP_VER=$(PARIGP_VER) GP2C_VER=$(GP2C_VER))
+	@$(call goss_docker_image,"$(LOCAL_PREFIX):latest","tests/gp.yaml","PARIGP_VER=$(PARIGP_VER)")
+	@$(call goss_docker_image,"$(LOCAL_PREFIX):latest-alldata","tests/gp_alldata.yaml")
+	@$(call goss_docker_image,"$(LOCAL_PREFIX):gp2c-latest","tests/gp2c.yaml","PARIGP_VER=$(PARIGP_VER) GP2C_VER=$(GP2C_VER)")
