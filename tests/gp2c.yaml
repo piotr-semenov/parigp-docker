@@ -1,8 +1,8 @@
+---
 command:
   gp2c -v:
     exit-status: 0
-    stdout: [{{ .Env.PARIGP_VER }}]
-    stdout: [{{ .Env.GP2C_VER }}]
+    stdout: [{{.Env.PARIGP_VER}}, {{.Env.GP2C_VER}}]
 
   echo 'f(n) = prime(n)' | gp2c:
     exit-status: 0

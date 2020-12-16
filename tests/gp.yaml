@@ -1,7 +1,8 @@
+---
 command:
   gp --version-short:
     exit-status: 0
-    stdout: [{{ .Env.PARIGP_VER }}]
+    stdout: [{{.Env.PARIGP_VER}}]
 
   echo 'ellinit("11a1")' | gp -q:
     exit-status: 0
