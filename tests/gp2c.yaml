@@ -1,0 +1,15 @@
+command:
+  gp2c -v:
+    exit-status: 0
+    stdout: [{{ .Env.PARIGP_VER }}]
+    stdout: [{{ .Env.GP2C_VER }}]
+
+  echo 'f(n) = prime(n)' | gp2c:
+    exit-status: 0
+    stdout: ["#include <pari/pari.h>"]
+    stderr: []
+
+  echo 'f1(n) = vector(n, i, i^2); addhelp(f1, "f1(n) returns the series of number squares from 1 upto n.");' > /test.gp && echo '??f1' | gp2c-run /test.gp:
+    exit-status: 0
+    stdout: ["f1(n) returns the series of number squares from 1 upto n."]
+    stderr: []

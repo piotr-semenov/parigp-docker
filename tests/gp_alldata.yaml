@@ -1,0 +1,24 @@
+command:
+  echo 'ellinit("11a1")' | gp -q:
+    exit-status: 0
+    stdout: ["[0, -1, 1, -10, -20, -4, -20, -79, -21, 496, 20008, -161051, -122023936/161051, Vecsmall([1]), [Vecsmall([128, -1])], [0, 0, 0, 0, 0, 0, 0, 0]]"]
+
+  echo 'galoisgetpol(8)' | gp -q:
+    exit-status: 0
+    stdout: ["5"]
+
+  echo 'galoisgetname(12,1)' | gp -q:
+    exit-status: 0
+    stdout: ["C3 : C4"]
+
+  echo 'ellmodulareqn(11)' | gp -q:
+    exit-status: 0
+    stdout: ["[x^12 + (-y + 744)*x^11 + 196680*x^10 + (187*y + 21354080)*x^9 + (506*y + 830467440)*x^8 + (-11440*y + 16875327744)*x^7 + (-57442*y + 208564958976)*x^6 + (184184*y + 1678582287360)*x^5 + (1675784*y + 9031525113600)*x^4 + (1867712*y + 32349979904000)*x^3 + (-8252640*y + 74246810880000)*x^2 + (-19849600*y + 98997734400000)*x + (y^2 - 8720000*y + 58411072000000), 1]"]
+
+  echo 'polgalois(x^8-2)' | gp -q:
+    exit-status: 0
+    stdout: ["[16, -1, 8, \"2D_8(8)=[D(4)]2\"]"]
+
+file:
+  /usr/local/share/pari/nftables/T20.gp:
+    exists: true

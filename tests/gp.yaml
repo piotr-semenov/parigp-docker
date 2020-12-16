@@ -1,0 +1,24 @@
+command:
+  gp --version-short:
+    exit-status: 0
+    stdout: [{{ .Env.PARIGP_VER }}]
+
+  echo 'ellinit("11a1")' | gp -q:
+    exit-status: 0
+    stderr: ["error"]
+
+  echo 'galoisgetpol(8)' | gp -q:
+    exit-status: 0
+    stderr: ["error"]
+
+  echo 'galoisgetname(12,1)' | gp -q:
+    exit-status: 0
+    stderr: ["error"]
+
+  echo 'ellmodulareqn(11)' | gp -q:
+    exit-status: 0
+    stderr: ["error"]
+
+  echo 'polgalois(x^8-2)' | gp -q:
+    exit-status: 0
+    stderr: ["error"]
