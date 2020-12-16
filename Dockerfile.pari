@@ -13,8 +13,8 @@ COPY ./dockerfile-commons/curl_and_gpgverify.sh ./dockerfile-commons/reduce_alpi
 
 WORKDIR /tmp
 
-# hadolint ignore=SC2011
-RUN mkdir ./data/ &&\
+# hadolint ignore=SC2011,SC2010
+RUN mkdir ./data &&\
     \
     # Download & verify the queried pari/gp with the packages.
     eval "echo unix/pari-$parigp_version.tar.gz\
@@ -23,10 +23,12 @@ RUN mkdir ./data/ &&\
     \
     # Unpack & install.
     ls ./*.*gz | xargs gunzip &&\
-    ls ./*.tar | xargs -I@ tar xf @ &&\
+    tar xf "pari-$parigp_version.tar" &&\
+    (tar xf nftables*.tar -C ./data 2> /dev/null || true) &&\
+    (ls ./*.tar | grep -Ev 'pari|nftables' | xargs -I@ tar xf @ --strip-components 1 -C ./data || true) &&\
     \
     bash -c 'cd "/tmp/pari-$parigp_version/" && ./Configure && make gp dobench install' &&\
-    (mv /tmp/data /usr/local/share/pari/ || true) &&\
+    (cp -r /tmp/data/* /usr/local/share/pari/ || true) &&\
     \
     # Reduce to the minimal size distribution.
     # Tool gphelp is developed in pure Perl, so no need even for core packages.
@@ -35,7 +37,9 @@ RUN mkdir ./data/ &&\
                                         /usr/local/lib/pari/pari.cfg\
                                         \
                                         /usr/local/include/pari\
-                                        /usr/local/share/pari/{data,doc} &&\
+                                        /usr/local/share/pari/doc &&\
+    \
+    (cp -r /tmp/data/* /target/usr/local/share/pari/ || true) &&\
     \
     # Clean out.
     rm -rf /tmp/* &&\
