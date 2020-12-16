@@ -65,3 +65,5 @@ LABEL \
     maintainer='Piotr Semenov <piotr.k.semenov@gmail.com>'
 
 COPY --from=builder1 /target /
+
+ENTRYPOINT ["sh", "-c"]
