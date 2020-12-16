@@ -29,3 +29,11 @@ build_gp: ## Builds the images for PARI/GP.
 .PHONY: build_gp2c
 build_gp2c:  ## Builds the image for GP2C/GP2C-RUN.
 	@$(call build_docker_image,"$(IMAGE_NAME):gp2c-latest","gp2c_version=$(GP2C_VER)","-f Dockerfile.gp2c .")
+
+
+.PHONY: test
+test:  ## Tests the the already built images.
+	@$(call goss_docker_image,$(IMAGE_NAME):latest,tests/gp.yaml,PARIGP_VER=$(PARIGP_VER))
+	@$(call goss_docker_image,$(IMAGE_NAME):latest-alldata,tests/gp_alldata.yaml)
+
+	@$(call goss_docker_image,$(IMAGE_NAME):gp2c-latest,tests/gp2c.yaml,PARIGP_VER=$(PARIGP_VER) GP2C_VER=$(GP2C_VER))
