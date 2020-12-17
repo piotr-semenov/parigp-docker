@@ -4,9 +4,11 @@
 
 SHELL := /bin/bash
 
-LOCAL_PREFIX ?= semenovp/tiny-parigp
+IMAGE_NAME ?= semenovp/tiny-parigp
 PARIGP_VER ?= "2.13.0"
 GP2C_VER ?= "0.0.12"
+
+VCS_REF=$(shell git rev-parse --short HEAD)
 
 
 .PHONY: help
@@ -22,19 +24,19 @@ build: lint-dockerfiles build_gp build_gp2c;  ## Buolds all the images.
 
 .PHONY: build_gp
 build_gp: export ARGS=-f Dockerfile.pari .
-build_gp: export BUILD_ARGS=parigp_version=$(PARIGP_VER)
+build_gp: export BUILD_ARGS='parigp_version="$(PARIGP_VER)" vcsref="$(VCS_REF)"'
 build_gp: ## Builds the images for PARI/GP.
-	$(call build_docker_image,"$(LOCAL_PREFIX):latest","parigp_packages='' $(BUILD_ARGS)","$(ARGS)")
-	$(call build_docker_image,"$(LOCAL_PREFIX):latest-alldata","$(BUILD_ARGS)","$(ARGS)")
+	@$(call build_docker_image,"$(IMAGE_NAME):latest","parigp_packages='' $(BUILD_ARGS)","$(ARGS)")
+	@$(call build_docker_image,"$(IMAGE_NAME):latest-alldata","$(BUILD_ARGS)","$(ARGS)")
 
 
 .PHONY: build_gp2c
 build_gp2c:  ## Builds the image for GP2C/GP2C-RUN.
-	$(call build_docker_image,"$(LOCAL_PREFIX):gp2c-latest","gp2c_version=$(GP2C_VER)","-f Dockerfile.gp2c .")
+	@$(call build_docker_image,"$(IMAGE_NAME):gp2c-latest",'gp2c_version="$(GP2C_VER)" vcsref="$(VCS_REF)"',"-f Dockerfile.gp2c .")
 
 
 .PHONY: test
 test:  ## Tests the the already built images.
-	@$(call goss_docker_image,"$(LOCAL_PREFIX):latest","tests/gp.yaml","PARIGP_VER=$(PARIGP_VER)")
-	@$(call goss_docker_image,"$(LOCAL_PREFIX):latest-alldata","tests/gp_alldata.yaml")
-	@$(call goss_docker_image,"$(LOCAL_PREFIX):gp2c-latest","tests/gp2c.yaml","PARIGP_VER=$(PARIGP_VER) GP2C_VER=$(GP2C_VER)")
+	@$(call goss_docker_image,"$(IMAGE_NAME):latest","tests/gp.yaml","PARIGP_VER=$(PARIGP_VER)")
+	@$(call goss_docker_image,"$(IMAGE_NAME):latest-alldata","tests/gp_alldata.yaml")
+	@$(call goss_docker_image,"$(IMAGE_NAME):gp2c-latest","tests/gp2c.yaml","PARIGP_VER=$(PARIGP_VER) GP2C_VER=$(GP2C_VER)")
