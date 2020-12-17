@@ -4,7 +4,7 @@
 
 SHELL := /bin/bash
 
-IMAGE_NAME ?= semenovp/tiny-parigp
+IMAGE_NAME = semenovp/tiny-parigp
 PARIGP_VER ?= "2.13.0"
 GP2C_VER ?= "0.0.12"
 
